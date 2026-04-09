@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0d1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Flota">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>🚗 Flota Firmowa</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#0d1117}
+iframe{width:100%;height:100%;border:none}
+#splash{position:fixed;inset:0;background:#0d1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;transition:opacity .5s}
+#splash.hide{opacity:0;pointer-events:none}
+#splash .icon{font-size:64px;animation:bounce 1.2s ease infinite}
+#splash .title{color:#fff;font-family:sans-serif;font-size:22px;font-weight:900;margin-top:16px;letter-spacing:-0.5px}
+#splash .sub{color:#4a9eff;font-family:sans-serif;font-size:12px;margin-top:6px;letter-spacing:2px;text-transform:uppercase}
+#splash .bar{width:120px;height:3px;background:#1e2d4a;border-radius:3px;margin-top:24px;overflow:hidden}
+#splash .bar::after{content:'';display:block;width:40%;height:100%;background:#4a9eff;border-radius:3px;animation:load 1.5s ease infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(350%)}}
+</style>
+</head>
+<body>
+<div id="splash">
+  <div class="icon">🚗</div>
+  <div class="title">Flota Firmowa</div>
+  <div class="sub">Zarządzanie flotą</div>
+  <div class="bar"></div>
+</div>
+<iframe id="app" src="https://script.google.com/macros/s/AKfycbweYiLR-MBkuzU3arIhZdcUE83a7rJYM7fKZMCbF0USRUnBwFgm1ZewVLLDfaboEPouuA/exec" allow="clipboard-write"></iframe>
+<script>
+const iframe=document.getElementById('app');
+const splash=document.getElementById('splash');
+iframe.addEventListener('load',()=>{setTimeout(()=>splash.classList.add('hide'),800);});
+setTimeout(()=>splash.classList.add('hide'),6000);
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
