@@ -33,15 +33,54 @@ iframe{width:100%;height:100%;border:none}
   <div class="bar"></div>
 </div>
 <iframe id="app" src="https://script.google.com/macros/s/AKfycbweYiLR-MBkuzU3arIhZdcUE83a7rJYM7fKZMCbF0USRUnBwFgm1ZewVLLDfaboEPouuA/exec" allow="clipboard-write"></iframe>
-<script>
-const iframe=document.getElementById('app');
-const splash=document.getElementById('splash');
-iframe.addEventListener('load',()=>{setTimeout(()=>splash.classList.add('hide'),800);});
-setTimeout(()=>splash.classList.add('hide'),6000);
 
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(()=>{});
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDafjY09SSZ3OPaKgFn4-eWn0PIcFHeypE",
+  authDomain: "flota-app-492109-5eeda.firebaseapp.com",
+  projectId: "flota-app-492109-5eeda",
+  storageBucket: "flota-app-492109-5eeda.firebasestorage.app",
+  messagingSenderId: "126238696647",
+  appId: "1:126238696647:web:59b820476d8c3094c98ae2"
+};
+
+const VAPID_KEY = 'BMhITYHRj1Z1kcXuQXCu5hnM6WxWxX7OORl6sGS3pz_OzkshJqK1PCX7unY46i7mF2bmpRp_EBlDN6OSz5YyUms';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbweYiLR-MBkuzU3arIhZdcUE83a7rJYM7fKZMCbF0USRUnBwFgm1ZewVLLDfaboEPouuA/exec';
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+async function setupPush() {
+  const sw = await navigator.serviceWorker.register('sw.js');
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') return;
+
+  const token = await getToken(messaging, {
+    vapidKey: VAPID_KEY,
+    serviceWorkerRegistration: sw
+  });
+
+  if (token) {
+    await fetch(GAS_URL + '?action=saveToken&token=' + encodeURIComponent(token));
+  }
 }
+
+onMessage(messaging, (payload) => {
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/icon-192.png'
+  });
+});
+
+setupPush().catch(console.error);
+
+const iframe = document.getElementById('app');
+const splash = document.getElementById('splash');
+iframe.addEventListener('load', () => { setTimeout(() => splash.classList.add('hide'), 800); });
+setTimeout(() => splash.classList.add('hide'), 6000);
 </script>
 </body>
 </html>
