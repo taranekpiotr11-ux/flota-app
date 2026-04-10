@@ -42,3 +42,28 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(clients.openWindow('/'));
 });
+// Dodaj NA SAMYM POCZĄTKU sw.js (przed obecnym kodem):
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging-compat.js');
+
+firebase.initializeApp({
+  apiKey: "AIzaSy...",              // ← te same wartości co w index.html
+  authDomain: "flota-app-492109.firebaseapp.com",
+  projectId: "flota-app-492109",
+  messagingSenderId: "126238696647",
+  appId: "1:126238696647:web:..."
+});
+
+const messagingFCM = firebase.messaging();
+
+// Powiadomienia gdy aplikacja jest W TLE (to obsługuje Firebase automatycznie)
+messagingFCM.onBackgroundMessage((payload) => {
+  self.registration.showNotification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/icon-192.png',
+    badge: '/icon-192.png',
+    vibrate: [200, 100, 200]
+  });
+});
+
+// ↓ RESZTA Twojego obecnego kodu sw.js zostaje bez zmian ↓
