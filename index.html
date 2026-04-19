@@ -2,7 +2,7 @@
 <html lang="pl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0d1117">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -13,7 +13,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{width:100%;height:100%;overflow:hidden;background:#0d1117}
-iframe{width:100%;height:100%;border:none}
+iframe{width:100%;height:100%;border:none;display:block}
 #splash{position:fixed;inset:0;background:#0d1117;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;transition:opacity .5s}
 #splash.hide{opacity:0;pointer-events:none}
 #splash .icon{font-size:64px;animation:bounce 1.2s ease infinite}
@@ -34,13 +34,24 @@ iframe{width:100%;height:100%;border:none}
 </div>
 <iframe id="app" src="https://script.google.com/macros/s/AKfycby9eO4N4dHyXsiZTYqiuy6FQZmCH3sZZcOQ9jItuqE8im7B4-lrSJVtOOFhXchrYu3rfg/exec" allow="clipboard-write"></iframe>
 <script>
-if('serviceWorker' in navigator){
-  navigator.serviceWorker.register('sw.js').catch(function(){});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('sw.js', { scope: '/flota-app/', updateViaCache: 'none' })
+      .then(function (reg) {
+        reg.update();
+        if (reg.waiting) reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+      })
+      .catch(function (err) { console.warn('SW register failed:', err); });
+
+    navigator.serviceWorker.addEventListener('controllerchange', function () {
+      // nowy SW przejął kontrolę – nic nie rób, następne odpalenie złapie nową wersję
+    });
+  });
 }
-const iframe=document.getElementById('app');
-const splash=document.getElementById('splash');
-iframe.addEventListener('load',function(){setTimeout(function(){splash.classList.add('hide');},800);});
-setTimeout(function(){splash.classList.add('hide');},6000);
+var iframe = document.getElementById('app');
+var splash = document.getElementById('splash');
+iframe.addEventListener('load', function () { setTimeout(function () { splash.classList.add('hide'); }, 800); });
+setTimeout(function () { splash.classList.add('hide'); }, 6000);
 </script>
 </body>
 </html>
